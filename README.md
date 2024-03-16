@@ -1,40 +1,128 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Reactivu: Vue's Reactivity, Reimagined for React
 
-## Getting Started
+## Elevate Your React Apps
+Reactivu seamlessly integrates Vue's intuitive reactivity system into React, offering a streamlined state management experience. Say goodbye to the cumbersome useState boilerplate and hello to a more efficient, reactive state sharing across components and pages.
 
-First, run the development server:
+## Key Features at a Glance
+- **State Sharing Made Simple**: Effortlessly share state across different pages without prop drilling or context wrapping.
+- **Boilerplate Begone**: Eliminate the verbose useState setup, making your code cleaner and more readable.
+- **NextJS Ready**: Comes with an out-of-the-box implementation for NextJS, enabling you to leverage Reactivu in your NextJS projects right away.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## Dive Into Reactivu with a Todo List Example
+Explore how Reactivu simplifies state management in React through a practical Todo List example, showcasing the power and ease of use of Vue-like reactivity in a React environment.
+
+```js
+import useVueLikeReactivity from './useVueLikeReactivity';
+function TodoList() {
+
+  const state = useVueLikeReactivity({
+    todos: [],
+    newTodoText: ''
+  });
+
+  const addTodo = () => {
+    if (state.newTodoText.trim() !== '') {
+      state.todos.push({ text: state.newTodoText, completed: false });
+      state.newTodoText = '';
+    }
+  };
+
+  const toggleTodo = todo => {
+    todo.completed = !todo.completed;
+  };
+
+  const deleteTodo = index => {
+    state.todos.splice(index, 1);
+  };
+
+  return (
+    <div>
+      <h1>Todo List</h1>
+      <input
+        type="text"
+        value={state.newTodoText}
+        onChange={e => (state.newTodoText = e.target.value)}
+        placeholder="Enter a new todo"
+      />
+      <button onClick={addTodo}>Add Todo</button>
+      <ul>
+        {state.todos.map((todo, index) => (
+          <li key={index}>
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => toggleTodo(todo)}
+            />
+            <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
+              {todo.text}
+            </span>
+            <button onClick={() => deleteTodo(index)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default TodoList;
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+<details>
+<summary>The old way </summary>
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+```js 
+import React, { useState } from 'react';
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+function TodoList() {
+  const [todos, setTodos] = useState([]);
+  const [newTodoText, setNewTodoText] = useState('');
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+  const addTodo = () => {
+    if (newTodoText.trim() !== '') {
+      setTodos([...todos, { text: newTodoText, completed: false }]);
+      setNewTodoText('');
+    }
+  };
 
-## Learn More
+  const toggleTodo = index => {
+    const updatedTodos = [...todos];
+    updatedTodos[index].completed = !updatedTodos[index].completed;
+    setTodos(updatedTodos);
+  };
 
-To learn more about Next.js, take a look at the following resources:
+  const deleteTodo = index => {
+    const updatedTodos = [...todos];
+    updatedTodos.splice(index, 1);
+    setTodos(updatedTodos);
+  };
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+  return (
+    <div>
+      <h1>Todo List</h1>
+      <input
+        type="text"
+        value={newTodoText}
+        onChange={e => setNewTodoText(e.target.value)}
+        placeholder="Enter a new todo"
+      />
+      <button onClick={addTodo}>Add Todo</button>
+      <ul>
+        {todos.map((todo, index) => (
+          <li key={index}>
+            <input
+              type="checkbox"
+              checked={todo.completed}
+              onChange={() => toggleTodo(index)}
+            />
+            <span style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}>
+              {todo.text}
+            </span>
+            <button onClick={() => deleteTodo(index)}>Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
